@@ -1,0 +1,2020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FWS B1 Top-Loss Safety Dashboard - Editable</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 40px;
+            background: rgba(30, 41, 59, 0.8);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .edit-mode {
+            outline: 2px dashed #3b82f6;
+            outline-offset: -2px;
+            background: rgba(59, 130, 246, 0.05);
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .editable-input {
+            background: #0f172a;
+            border: 2px solid #3b82f6;
+            color: #e2e8f0;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-family: inherit;
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        .editable-input:focus {
+            outline: none;
+            border-color: #60a5fa;
+            box-shadow: 0 0 10px rgba(96, 165, 250, 0.3);
+        }
+
+        .edit-button {
+            background: #3b82f6;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 5px 2px;
+            transition: all 0.3s ease;
+        }
+
+        .edit-button:hover {
+            background: #60a5fa;
+            transform: translateY(-2px);
+        }
+
+        .edit-button.delete {
+            background: #ef4444;
+        }
+
+        .edit-button.delete:hover {
+            background: #f87171;
+        }
+
+        .edit-button.add {
+            background: #10b981;
+        }
+
+        .edit-button.add:hover {
+            background: #34d399;
+        }
+
+        .project-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-left: 15px;
+        }
+
+        .header-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .header-item {
+            padding: 15px;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 8px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .header-label {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .header-content {
+            font-weight: 600;
+            color: #cbd5e1;
+            font-size: 0.95rem;
+        }
+
+        .mode-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            align-items: center;
+            flex-wrap: wrap;
+            background: rgba(30, 41, 59, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+        }
+
+        .mode-indicator {
+            font-weight: 700;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .mode-indicator.view {
+            background: #10b981;
+            color: #000;
+        }
+
+        .mode-indicator.edit {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: 2px solid #475569;
+            background: #1e293b;
+            color: #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        button:hover {
+            border-color: #3b82f6;
+            background: #334155;
+            transform: translateY(-2px);
+        }
+
+        button.active {
+            border-color: #3b82f6;
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+            transform: translateY(-4px);
+        }
+
+        .card.in-edit-mode {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .card-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .metric-display {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #f1f5f9;
+        }
+
+        .metric-value.editable {
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        .metric-value.editable:hover {
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        .metric-unit {
+            font-size: 1rem;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-top: 10px;
+        }
+
+        .trend {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .trend.down {
+            color: #10b981;
+        }
+
+        .trend.up {
+            color: #ef4444;
+        }
+
+        .gauge {
+            width: 100%;
+            height: 120px;
+            margin: 15px 0;
+        }
+
+        .gauge-bar {
+            width: 100%;
+            height: 30px;
+            background: #0f172a;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #334155;
+        }
+
+        .gauge-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .gauge-fill.excellent { background: linear-gradient(90deg, #10b981, #34d399); }
+        .gauge-fill.good { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+        .gauge-fill.warning { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .gauge-fill.critical { background: linear-gradient(90deg, #ef4444, #f87171); }
+
+        .gauge-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        .status-active {
+            background-color: #10b981;
+            color: #000;
+        }
+
+        .status-warning {
+            background-color: #f59e0b;
+            color: #000;
+        }
+
+        .status-critical {
+            background-color: #ef4444;
+            color: #fff;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 40px 0 20px 0;
+            color: #e2e8f0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #334155;
+        }
+
+        .timeline {
+            margin-top: 15px;
+        }
+
+        .timeline-item {
+            padding: 12px;
+            border-left: 3px solid #3b82f6;
+            background: rgba(59, 130, 246, 0.05);
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .timeline-time {
+            color: #94a3b8;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .timeline-content {
+            color: #cbd5e1;
+            margin-top: 5px;
+        }
+
+        .shoutout-board {
+            background: linear-gradient(135deg, #dc2626, #ff7f50);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+            color: #fff;
+        }
+
+        .shoutout-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #fbbf24;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .shoutout-content {
+            flex: 1;
+        }
+
+        .shoutout-title {
+            color: #fcd34d;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .shoutout-description {
+            font-size: 0.9rem;
+            color: #f3f4f6;
+        }
+
+        .week-focus {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            border-radius: 12px;
+            padding: 20px;
+            color: #fff;
+            margin-top: 20px;
+        }
+
+        .week-focus-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #dbeafe;
+        }
+
+        .week-focus-content {
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .team-member {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .team-name {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 5px;
+            color: #cbd5e1;
+        }
+
+        .team-role {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+
+        .team-status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: rgba(16, 185, 129, 0.2);
+            color: #86efac;
+            border: 1px solid #22c55e;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid;
+        }
+
+        .alert.info {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: #3b82f6;
+            color: #93c5fd;
+        }
+
+        .alert.success {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: #10b981;
+            color: #86efac;
+        }
+
+        .alert.warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: #f59e0b;
+            color: #fcd34d;
+        }
+
+        .audit-checklist {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #334155;
+        }
+
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #3b82f6;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0f172a;
+        }
+
+        .checkbox.checked {
+            background: #10b981;
+            border-color: #10b981;
+            color: #000;
+            font-weight: 700;
+        }
+
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            height: 150px;
+            margin-top: 15px;
+        }
+
+        .bar {
+            flex: 1;
+            background: linear-gradient(180deg, #3b82f6, #1e40af);
+            border-radius: 4px 4px 0 0;
+            position: relative;
+            min-height: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .bar:hover {
+            background: linear-gradient(180deg, #60a5fa, #1e40af);
+            filter: brightness(1.1);
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+        }
+
+        .expandable.collapsed .details {
+            display: none;
+        }
+
+        .expand-icon {
+            display: inline-block;
+            transition: transform 0.3s ease;
+            margin-right: 10px;
+        }
+
+        .expandable.collapsed .expand-icon {
+            transform: rotate(-90deg);
+        }
+
+        .details {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #334155;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: #e2e8f0;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Safety Metrics Styles */
+        .safety-metric-card {
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .safety-metric-card.critical {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .safety-metric-card.warning {
+            border-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        .safety-metric-card.good {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .metric-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            margin-bottom: 5px;
+        }
+
+        .metric-status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-status-badge.critical {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        .metric-status-badge.warning {
+            background: #f59e0b;
+            color: #000;
+        }
+
+        .metric-status-badge.good {
+            background: #10b981;
+            color: #000;
+        }
+
+        .metric-value-display {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin: 15px 0;
+        }
+
+        .metric-large-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #f1f5f9;
+        }
+
+        .metric-unit {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .metric-target {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+
+        .metric-gauge {
+            width: 100%;
+            height: 8px;
+            background: #0f172a;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+            border: 1px solid #334155;
+        }
+
+        .metric-gauge-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+            border-radius: 4px;
+        }
+
+        .metric-gauge-fill.critical {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+        }
+
+        .metric-gauge-fill.warning {
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+        }
+
+        .metric-gauge-fill.good {
+            background: linear-gradient(90deg, #10b981, #059669);
+        }
+
+        .metric-description {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+
+        .metric-recommendation {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 3px solid #3b82f6;
+            padding: 10px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #93c5fd;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        .priority-action-card {
+            background: #1e293b;
+            border-left: 4px solid;
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .priority-action-card.level1 {
+            border-left-color: #ef4444;
+            background: rgba(239, 68, 68, 0.08);
+        }
+
+        .priority-action-card.level2 {
+            border-left-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.08);
+        }
+
+        .priority-action-card.level3 {
+            border-left-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.08);
+        }
+
+        .priority-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .priority-badge {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .priority-badge.critical {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        .priority-badge.high {
+            background: #f59e0b;
+            color: #000;
+        }
+
+        .priority-badge.medium {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        .priority-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            flex: 1;
+        }
+
+        .priority-description {
+            color: #cbd5e1;
+            margin-bottom: 12px;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .priority-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .priority-detail {
+            font-size: 0.85rem;
+        }
+
+        .priority-detail-label {
+            color: #94a3b8;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .priority-detail-value {
+            color: #cbd5e1;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            .project-badge {
+                display: block;
+                margin-left: 0;
+                margin-top: 10px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .metric-value {
+                font-size: 2rem;
+            }
+
+            header {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="mode-toggle">
+            <span class="mode-indicator" id="modeIndicator">VIEW MODE</span>
+            <button onclick="toggleEditMode()" style="margin-left: auto;">✏️ Toggle Edit Mode</button>
+            <button onclick="saveData()">💾 Save Changes</button>
+            <button onclick="resetData()" style="background: #1e293b; border-color: #ef4444; color: #fca5a5;">↺ Reset</button>
+            <button onclick="exportData()" style="background: #1e293b; border-color: #10b981; color: #86efac;">📥 Export</button>
+        </div>
+
+        <header>
+            <h1>
+                🛡️ <span id="title" class="edit-mode" onclick="editField(event)">FWS B1 Safety Dashboard</span>
+                <span class="project-badge" id="badge" class="edit-mode" onclick="editField(event)">Top-Loss Action Plan</span>
+            </h1>
+            <div class="header-grid">
+                <div class="header-item">
+                    <div class="header-label">Project Owners</div>
+                    <div class="header-content" id="owners" class="edit-mode" onclick="editField(event)">Jordan, Tom, Yashir</div>
+                </div>
+                <div class="header-item">
+                    <div class="header-label">Focus Area</div>
+                    <div class="header-content" id="focus" class="edit-mode" onclick="editField(event)">Footwear (FWS)</div>
+                </div>
+                <div class="header-item">
+                    <div class="header-label">Team Members</div>
+                    <div class="header-content" id="team" class="edit-mode" onclick="editField(event)">Safety Team & FWS Ops</div>
+                </div>
+                <div class="header-item">
+                    <div class="header-label">Updated</div>
+                    <div class="header-content" id="lastUpdate">Loading...</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="controls">
+            <button class="active" onclick="filterView('metrics')">📈 Metrics</button>
+            <button onclick="filterView('weekly')">📅 Weekly Topics</button>
+            <button onclick="filterView('recognition')">⭐ Recognition</button>
+        </div>
+
+
+
+        <!-- Metrics Section -->
+        <div id="metrics-section" class="view-section">
+            <div class="section-title">📈 Key Performance Indicators</div>
+            
+            <div style="margin-bottom: 20px;">
+                <button class="edit-button add" onclick="addKPI()" id="addKPIBtn" style="display:none;">+ Add New KPI</button>
+            </div>
+
+            <div id="kpiContainer" class="dashboard-grid">
+                <!-- KPIs loaded from data -->
+            </div>
+
+            <!-- Safety Analysis Section -->
+            <div style="margin-top: 50px; padding-top: 30px; border-top: 2px solid #334155;">
+                <div class="section-title" style="margin-bottom: 30px;">⚠️ Critical Safety Metrics & Analysis</div>
+                
+                <div class="dashboard-grid" id="safetyMetricsContainer">
+                    <!-- Safety metrics gauges loaded from data -->
+                </div>
+
+                <!-- Risk Priority Panel -->
+                <div style="margin-top: 40px; padding: 25px; background: rgba(59, 130, 246, 0.08); border: 2px solid #334155; border-radius: 12px;">
+                    <div class="section-title" style="color: #fca5a5; margin-bottom: 20px;">🔴 Priority Action Items</div>
+                    <div id="priorityActionsContainer" style="display: grid; gap: 15px;">
+                        <!-- Priority actions loaded from data -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly Topics Section -->
+        <div id="weekly-section" class="view-section" style="display:none;">
+            <div class="section-title">📅 Weekly Safety Focus Topics</div>
+            <div class="alert info">
+                <strong>Program Overview:</strong> 2-minute safety talks each week rotating through awareness topics. Demonstrations during safety stretches and start-ups.
+            </div>
+
+            <div id="weeklyTopicsContainer" class="dashboard-grid">
+                <!-- Weekly topics loaded from data -->
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="edit-button add" onclick="addWeeklyTopic()" id="addWeeklyBtn" style="display:none;">+ Add New Topic</button>
+            </div>
+        </div>
+
+        <!-- Recognition Section -->
+        <div id="recognition-section" class="view-section" style="display:none;">
+            <div class="section-title">⭐ Safe Work Practice Recognition Board</div>
+            <div class="alert info">
+                <strong>Recognition Program:</strong> Celebrating associates observed using PPE correctly and following safe work practices. Shout-outs given during start-ups and safety stretches. Tokens awarded as rewards!
+            </div>
+
+            <div class="shoutout-board">
+                <h2 style="margin-bottom: 20px; color: #fcd34d;">🌟 This Week's Safety Heroes 🌟</h2>
+                <div id="shoutoutContainer">
+                    <!-- Shoutouts loaded from data -->
+                </div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="edit-button add" onclick="addShoutout()" id="addShoutoutBtn" style="display:none;">+ Add Shoutout</button>
+                </div>
+            </div>
+
+
+        </div>
+
+
+
+        <!-- Footer -->
+        <div style="text-align: center; margin-top: 60px; padding: 30px 0; border-top: 1px solid #334155; color: #64748b;">
+            <p style="font-weight: 600;">FWS B1 Safety Dashboard | Top-Loss Action Plan | Editable Version</p>
+            <p style="margin-top: 10px; font-size: 0.85rem;">Owners: Jordan, Tom, Yashir | Local Storage: <span id="storageStatus">Ready</span></p>
+            <p style="margin-top: 10px; font-size: 0.8rem;">Last updated: <span id="footerUpdate">Loading...</span></p>
+        </div>
+    </div>
+
+    <script>
+        // ===== GLOBAL STATE =====
+        let editMode = false;
+        const STORAGE_KEY = 'fws_dashboard_data';
+
+        // Default data structure
+        const defaultData = {
+            title: 'FWS B1 Safety Dashboard',
+            badge: 'Top-Loss Action Plan',
+            owners: 'Jordan, Tom, Yashir',
+            focus: 'Footwear (FWS)',
+            team: 'Safety Team & FWS Ops',
+            mission: '<strong>🎯 Mission:</strong> Decrease incidents and injuries in FWS while increasing safety engagement and associate empowerment through awareness, behavior change, and recognition.',
+            metrics: {},
+
+            weeklyTopics: [
+                {
+                    week: 'Week 1',
+                    title: 'Safe Case Opening',
+                    content: 'Proper hand positioning and body mechanics when opening cases.',
+                    keyPoints: ['Use both hands for stability', 'Position body at proper angle', 'Avoid reaching or twisting', 'Use proper tools when available'],
+                    status: 'Completed'
+                },
+                {
+                    week: 'Week 2',
+                    title: 'Conveyor Awareness',
+                    content: 'Understanding conveyor hazards and safe operation practices.',
+                    keyPoints: ['Never reach over moving belts', 'Keep hands and fingers clear', 'Report belt malfunctions immediately', 'Use proper stopping procedures'],
+                    status: 'Completed'
+                },
+                {
+                    week: 'Week 3',
+                    title: 'Safe Lifting Practices',
+                    content: 'Proper lifting techniques to prevent back and strain injuries.',
+                    keyPoints: ['Bend at knees, not back', 'Keep load close to body', 'Test load weight first', 'Ask for help when needed'],
+                    status: 'Completed'
+                },
+                {
+                    week: 'Week 4',
+                    title: 'PPE Compliance & Awareness',
+                    content: 'Importance of personal protective equipment and proper usage.',
+                    keyPoints: ['Wear required PPE at all times', 'Ensure proper fit and condition', 'Report damaged PPE', 'Lead by example'],
+                    status: 'In Progress'
+                }
+            ],
+            shoutouts: [
+                {
+                    name: 'Marcus Johnson',
+                    title: 'PPE Champion',
+                    description: 'Observed consistently wearing all required PPE and helping team members with proper fitting. Great example to the whole team!'
+                },
+                {
+                    name: 'Diana Chen',
+                    title: 'Safe Lifting Expert',
+                    description: 'Demonstrated proper lifting technique while helping train new team members. Prevented potential injury!'
+                },
+                {
+                    name: 'Robert Wilson',
+                    title: 'Conveyor Safety',
+                    description: 'Reported conveyor belt issue before it became a hazard. Proactive safety thinking!'
+                },
+                {
+                    name: 'Team Effort',
+                    title: 'Case Opening Compliance',
+                    description: 'Entire 2nd shift demonstrated 100% compliance with safe case opening procedures all week!'
+                }
+            ],
+            kpis: [
+                {
+                    title: 'Total Incidents Analyzed',
+                    bars: [
+                        { label: 'OSHA Recordable', value: 6, description: '46.15% - Reportable to OSHA' },
+                        { label: 'Non-Medical', value: 7, description: '53.85% - Lesser severity' }
+                    ]
+                },
+                {
+                    title: 'Incidents by Workstream (Book4 Data)',
+                    bars: [
+                        { label: 'Manual Material Handling', value: 10, description: '76.92% - CRITICAL' },
+                        { label: 'Falling Object', value: 1, description: '7.69%' },
+                        { label: 'Hand Tools/Equipment', value: 1, description: '7.69%' },
+                        { label: 'Other', value: 1, description: '7.69%' }
+                    ]
+                },
+                {
+                    title: 'Incidents by Body Part Affected (Book4 Data)',
+                    bars: [
+                        { label: 'Shoulder', value: 4, description: '30.77% - Most Frequent' },
+                        { label: 'Wrist', value: 2, description: '15.38% - Highest Severity' },
+                        { label: 'Face - Eyes', value: 2, description: '15.38% - 50% OSHA Rate' },
+                        { label: 'Other', value: 5, description: '38.46%' }
+                    ]
+                },
+                {
+                    title: 'OSHA Recordable Rate by Workstream',
+                    bars: [
+                        { label: 'Manual Material Handling', value: 50, description: '5 of 10 incidents - CRITICAL' },
+                        { label: 'Hand Tools/Equipment', value: 100, description: '1 of 1 incident - MAX SEVERITY' },
+                        { label: 'Falling Object', value: 0, description: '0 of 1 incident' },
+                        { label: 'Other', value: 0, description: '0 of 1 incident' }
+                    ]
+                },
+                {
+                    title: 'OSHA Recordable Rate by Body Part',
+                    bars: [
+                        { label: 'Wrist', value: 100, description: '2 of 2 - ALL Recordable' },
+                        { label: 'Hand - Palm', value: 100, description: '1 of 1 - ALL Recordable' },
+                        { label: 'Lower Back', value: 100, description: '1 of 1 - ALL Recordable' },
+                        { label: 'Others', value: 25, description: 'Average severity lower' }
+                    ]
+                },
+                {
+                    title: 'Incident Severity Distribution (Book4 Data)',
+                    bars: [
+                        { label: 'Non-Medical', value: 7, description: '53.85% of incidents' },
+                        { label: 'OSHA Recordable', value: 6, description: '46.15% of incidents - 9x above standard' }
+                    ]
+                },
+                {
+                    title: 'Manual Material Handling Risk Analysis',
+                    bars: [
+                        { label: 'Total Incidents', value: 10, description: '76.92% of all incidents' },
+                        { label: 'OSHA Rate', value: 50, description: 'Risk Score: 500 (CRITICAL)' },
+                        { label: 'Non-Medical', value: 5, description: '50% - less severe incidents' },
+                        { label: 'Recordable', value: 5, description: '50% - serious incidents' }
+                    ]
+                },
+                {
+                    title: 'High-Risk Body Parts Summary',
+                    bars: [
+                        { label: 'Shoulder', value: 4, description: '30.77% frequency - Risk Score 100 (HIGH)' },
+                        { label: 'Wrist', value: 2, description: '100% severity - Risk Score 200 (CRITICAL)' },
+                        { label: 'Face/Eyes', value: 2, description: '50% severity - Risk Score 100 (HIGH)' },
+                        { label: 'Other Locations', value: 5, description: '38.46% - various body parts' }
+                    ]
+                },
+                {
+                    title: 'Incident Location Breakdown (Book4 Data)',
+                    bars: [
+                        { label: 'Footwear Packing Lanes', value: 3, description: '23.08% of incidents - primary hotspot' },
+                        { label: 'Decasing Stations', value: 4, description: '30.77% of incidents - secondary hotspot' },
+                        { label: 'FWS Staging Lines', value: 2, description: '15.38% of incidents' },
+                        { label: 'Other Locations', value: 4, description: '30.77% - distributed across facility' }
+                    ]
+                },
+                {
+                    title: 'Risk Scoring Summary (Frequency × Severity)',
+                    bars: [
+                        { label: 'Manual Material Handling', value: 500, description: 'CRITICAL - Highest Risk' },
+                        { label: 'Wrist Injuries', value: 200, description: 'CRITICAL - Max Severity' },
+                        { label: 'Shoulder Injuries', value: 100, description: 'HIGH - Most Frequent' },
+                        { label: 'Other Hazards', value: 100, description: 'HIGH - Various factors' }
+                    ]
+                }
+            ],
+            safetyMetrics: [
+                {
+                    title: 'OSHA Recordable Rate',
+                    value: 46.15,
+                    target: 5,
+                    unit: '%',
+                    status: 'critical',
+                    description: 'CRITICAL: 46.15% of all incidents (6 of 13) are OSHA Recordable. This is 9x ABOVE industry standard. Indicates serious workplace injuries that must be reported to OSHA.',
+                    recommendation: 'URGENT ACTION REQUIRED: Implement comprehensive safety improvements across all workstreams, with particular focus on Manual Material Handling.'
+                },
+                {
+                    title: 'Manual Material Handling Dominance',
+                    value: 76.92,
+                    target: 30,
+                    unit: '%',
+                    status: 'critical',
+                    description: 'Manual Material Handling accounts for 10 of 13 incidents (76.92%). This single workstream represents nearly 4x the safe threshold. Risk Score: 500 (CRITICAL). OSHA Rate in this workstream: 50%.',
+                    recommendation: 'CRITICAL PRIORITY: Ergonomic assessment of all material handling tasks. Implement lifting aids, proper technique training, workstation redesign, and job rotation.'
+                },
+                {
+                    title: 'Wrist Injury Risk - HIGHEST SEVERITY',
+                    value: 100,
+                    target: 50,
+                    unit: '%',
+                    status: 'critical',
+                    description: 'All wrist injuries (2 incidents) are OSHA Recordable (100% severity). Risk Score: 200 (CRITICAL). While only 15% of total incidents, the severity is extreme.',
+                    recommendation: 'HIGH PRIORITY: Immediate review of manual handling techniques and tools. Provide wrist supports, consider task redesign, implement anti-fatigue protocols, and mandatory wrist protection.'
+                },
+                {
+                    title: 'Shoulder Injury Rate - Most Frequent',
+                    value: 30.77,
+                    target: 10,
+                    unit: '%',
+                    status: 'warning',
+                    description: 'Shoulder is the most frequently injured body part (4 incidents, 30.77%). Risk Score: 100 (HIGH). Pattern suggests cumulative/repetitive strain from lifting and carrying.',
+                    recommendation: 'PRIORITY 2: Implement shoulder-focused ergonomics program. Introduce mechanical lifting aids, job rotation, stretching exercises, and workstation modifications.'
+                },
+                {
+                    title: 'Hand Tools/Equipment Risk - MAXIMUM SEVERITY',
+                    value: 100,
+                    target: 50,
+                    unit: '%',
+                    status: 'critical',
+                    description: 'The single Hand Tools/Equipment incident (1 incident) is 100% OSHA Recordable. Tool-related hazards are inherently dangerous when they occur.',
+                    recommendation: 'URGENT: Comprehensive tool safety audit. Evaluate all hand tools for ergonomic design, implement tool guards, and provide specialized hand tool training.'
+                },
+                {
+                    title: 'Facial Injury Risk - Moderate Concern',
+                    value: 50,
+                    target: 10,
+                    unit: '%',
+                    status: 'warning',
+                    description: 'Face injuries (Eyes + Nose = 3 incidents, 23.07% of total). Eyes: 50% OSHA rate. Risk Score: 100 (HIGH). All occur in Manual Material Handling workstream.',
+                    recommendation: 'PRIORITY 3: Implement mandatory facial PPE in Manual Material Handling areas. Regular PPE compliance audits, eye protection fit-testing, and hazard prevention assessments.'
+                }
+            ],
+            priorityActions: [
+                {
+                    priority: 'CRITICAL',
+                    level: 1,
+                    title: 'PHASE 1: Manual Material Handling Audit & Redesign',
+                    description: '10 incidents (76.92%) with 50% OSHA rate represents unacceptable risk. (1) Ergonomic assessment of packing lanes and decasing stations; (2) Assess load weight, distance, frequency, postures; (3) Evaluate current lifting aids; (4) Design engineering controls (mechanical assists, conveyor modifications); (5) Implement best practices from industry standards.',
+                    impact: 'CRITICAL',
+                    timeline: 'Week 1-2: Audit | Week 3-6: Design & Implementation',
+                    owner: 'Safety Director + Operations Manager + Occupational Health',
+                    metrics: 'Week 1: Audit complete. Week 4: First interventions. Target: Reduce to 5 incidents, OSHA rate to 20%'
+                },
+                {
+                    priority: 'CRITICAL',
+                    level: 1,
+                    title: 'PHASE 2: Mandatory Safety Training - Material Handling & Ergonomics',
+                    description: 'All associates in Footwear department must complete: (1) Proper lifting technique; (2) Mechanical lifting aids use; (3) Task analysis and load assessment; (4) Reporting unsafe conditions; (5) Stretching and body mechanics. Training must be hands-on, in-station, with supervisor competency checks.',
+                    impact: 'CRITICAL',
+                    timeline: 'Complete by end of Week 2 (all shifts)',
+                    owner: 'Safety Team + Department Supervisors',
+                    metrics: '100% attendance + competency certification. Pre/post scores >85%. Monthly refreshers.'
+                },
+                {
+                    priority: 'CRITICAL',
+                    level: 1,
+                    title: 'PHASE 3: Wrist Safety - Tool Review & Hand Protection',
+                    description: 'Wrist injuries show 100% OSHA Recordable severity (2 incidents). (1) Audit all hand tools; (2) Evaluate for ergonomic design and vibration hazards; (3) Implement wrist supports/braces; (4) Provide anti-vibration gloves; (5) Job rotation to limit repetitive wrist motions; (6) Education on carpal tunnel and RSI signs.',
+                    impact: 'CRITICAL',
+                    timeline: 'Week 1: Tool audit | Week 2: PPE procurement | Week 3: Implementation',
+                    owner: 'Safety Team + Procurement + Supervisors',
+                    metrics: 'Zero wrist injuries. 100% PPE compliance. Monthly assessments.'
+                },
+                {
+                    priority: 'CRITICAL',
+                    level: 1,
+                    title: 'PHASE 4: Shoulder Injury Prevention - Multi-Modal Approach',
+                    description: 'Shoulder injuries are #1 location (30.77%, 4 incidents). (1) Implement 20-minute stretching breaks every 2 hours; (2) Provide shoulder-focused ergonomic equipment; (3) Job rotation to vary shoulder-loading tasks; (4) Strength/stability training in wellness program; (5) Monitor associates with prior shoulder issues; (6) Modify workstations to reduce reaching distance.',
+                    impact: 'CRITICAL',
+                    timeline: 'Stretching: Immediate | Equipment: Weeks 2-3 | Wellness: Week 4',
+                    owner: 'Occupational Health + Wellness Coordinator + Operations',
+                    metrics: '4 incidents to <1 per month. Pain reports decrease 50%. 90% program participation.'
+                },
+                {
+                    priority: 'CRITICAL',
+                    level: 1,
+                    title: 'PHASE 5: Eye & Face Protection Mandate in Material Handling',
+                    description: 'Face injuries (3 incidents: 2 eyes, 1 nose) suggest flying debris hazards. 50% OSHA Recordable. (1) Mandatory full-face protective equipment for packing/decasing; (2) Anti-fog, anti-scratch glasses minimum; (3) Face shields for high-hazard stations; (4) Monthly PPE compliance audits; (5) Education on eye protection importance.',
+                    impact: 'CRITICAL',
+                    timeline: 'Week 1: Implement mandate with training | Ongoing: Monthly audits',
+                    owner: 'Safety Team + Department Supervisors',
+                    metrics: 'Zero face injuries. 100% PPE compliance on first observation. Maintain monthly.'
+                },
+                {
+                    priority: 'HIGH',
+                    level: 2,
+                    title: 'PHASE 6: Incident Monitoring & Trending System',
+                    description: 'Establish comprehensive system: (1) Daily incident tracking with real-time reporting; (2) Weekly safety metrics reviews; (3) Monthly trend analysis; (4) Root cause investigation for all incidents; (5) Corrective action tracking; (6) Associate near-miss reporting culture; (7) Dashboard for leadership visibility. Use this dashboard as centerpiece for tracking progress.',
+                    impact: 'HIGH',
+                    timeline: 'System ready by end of Week 1, data entry begins immediately',
+                    owner: 'Safety Director + Safety Coordinator',
+                    metrics: 'Daily tracking started. Weekly reports. 100% root cause investigations. Corrective actions >90% closed.'
+                }
+            ]
+        };
+
+        // ===== INITIALIZATION =====
+        function initDashboard() {
+            checkServerConnection();
+            loadData();
+            updateTimestamp();
+            try {
+                renderWeeklyTopics();
+            } catch(e) { console.error('Error rendering weekly topics:', e); }
+            try {
+                renderShoutouts();
+            } catch(e) { console.error('Error rendering shoutouts:', e); }
+            try {
+                renderKPIs();
+            } catch(e) { console.error('Error rendering KPIs:', e); }
+            try {
+                renderSafetyMetrics();
+            } catch(e) { console.error('Error rendering safety metrics:', e); }
+            try {
+                renderPriorityActions();
+            } catch(e) { console.error('Error rendering priority actions:', e); }
+            setInterval(updateTimestamp, 1000);
+            
+            // Re-render metrics and actions after a brief delay to ensure DOM is fully ready
+            setTimeout(() => {
+                try {
+                    renderSafetyMetrics();
+                    renderPriorityActions();
+                } catch(e) { console.error('Error in delayed render:', e); }
+            }, 100);
+        }
+
+        // ===== DATA MANAGEMENT =====
+        function checkServerConnection() {
+            // Check if server is available
+            console.log('[DEBUG] checkServerConnection() called');
+            fetch(window.location.origin + '/api/status', {
+                method: 'GET',
+                headers: {'Accept': 'application/json'}
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('[INFO] Server connection: OK');
+                        updateStorageStatus('🟢 Server Connected');
+                    } else {
+                        console.warn('[WARNING] Server returned status:', response.status);
+                        updateStorageStatus('🟡 Server Error');
+                    }
+                })
+                .catch(error => {
+                    console.error('[ERROR] Cannot connect to server:', error.message);
+                    updateStorageStatus('🔴 Server Offline');
+                });
+        }
+
+        function loadData() {
+            // Load data from server API instead of localStorage
+            console.log('[DEBUG] loadData() called');
+            console.log('[DEBUG] Attempting to fetch from:', window.location.origin + '/api/data');
+            
+            fetch(window.location.origin + '/api/data', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    console.log('[DEBUG] Response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('[DEBUG] Data loaded successfully:', data);
+                    Object.assign(defaultData, data);
+                    updateDashboard();
+                    updateStorageStatus('✅ Loaded from Server');
+                })
+                .catch(error => {
+                    console.error('[ERROR] Error loading data from server:', error);
+                    console.error('[ERROR] Error message:', error.message);
+                    updateStorageStatus('⚠️ Using Default Data');
+                    updateDashboard();
+                });
+        }
+
+        function saveData() {
+            // Save data to server API instead of localStorage
+            console.log('[DEBUG] saveData() called');
+            console.log('[DEBUG] Data to save:', defaultData);
+            console.log('[DEBUG] Server URL:', window.location.origin + '/api/data');
+            
+            updateStorageStatus('💾 Saving...');
+            
+            fetch(window.location.origin + '/api/data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(defaultData)
+            })
+                .then(response => {
+                    console.log('[DEBUG] Save response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('[DEBUG] Save response:', data);
+                    if (data.success) {
+                        // Show success message
+                        const message = document.createElement('div');
+                        message.textContent = '✅ Data saved successfully to server!';
+                        message.style.cssText = 'position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 12px 24px; border-radius: 6px; z-index: 9999; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);';
+                        document.body.appendChild(message);
+                        console.log('[SUCCESS] Data saved successfully');
+                        setTimeout(() => message.remove(), 3000);
+                        updateStorageStatus('✅ Saved to Server');
+                    } else {
+                        throw new Error(data.error || 'Unknown server error');
+                    }
+                })
+                .catch(error => {
+                    console.error('[ERROR] Error saving data to server:', error);
+                    console.error('[ERROR] Error name:', error.name);
+                    console.error('[ERROR] Error message:', error.message);
+                    console.error('[ERROR] Stack:', error.stack);
+                    
+                    // Show detailed error message
+                    const message = document.createElement('div');
+                    message.textContent = '❌ Error saving data: ' + error.message;
+                    message.style.cssText = 'position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: #ef4444; color: white; padding: 12px 24px; border-radius: 6px; z-index: 9999; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);';
+                    document.body.appendChild(message);
+                    setTimeout(() => message.remove(), 5000);
+                    
+                    updateStorageStatus('❌ Save Failed - ' + error.message);
+                });
+        }
+
+        function resetData() {
+            if (confirm('🚨 Are you sure? This will reset all changes to default values!')) {
+                fetch('/api/reset', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        location.reload();
+                    })
+                    .catch(error => {
+                        console.error('Error resetting data:', error);
+                        location.reload();
+                    });
+            }
+        }
+
+        function exportData() {
+            const json = JSON.stringify(defaultData, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `fws-dashboard-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function updateStorageStatus(status) {
+            document.getElementById('storageStatus').textContent = status;
+        }
+
+        // ===== UI UPDATES =====
+        function updateDashboard() {
+            // Update header
+            document.getElementById('title').textContent = defaultData.title;
+            document.getElementById('badge').textContent = defaultData.badge;
+            document.getElementById('owners').textContent = defaultData.owners;
+            document.getElementById('focus').textContent = defaultData.focus;
+            document.getElementById('team').textContent = defaultData.team;
+            document.getElementById('mission').innerHTML = defaultData.mission;
+
+            // Metrics removed
+        }
+
+        function renderWeeklyTopics() {
+            const container = document.getElementById('weeklyTopicsContainer');
+            container.innerHTML = defaultData.weeklyTopics.map((topic, idx) => `
+                <div class="week-focus expandable" onclick="toggleExpand(this)">
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                        <div>
+                            <div class="week-focus-title">
+                                <span class="expand-icon">▼</span>
+                                ${topic.week}: ${topic.title}
+                            </div>
+                            <div style="font-size: 0.9rem; color: #dbeafe; margin: 5px 0;">${topic.content}</div>
+                        </div>
+                        ${editMode ? `<button class="edit-button delete" onclick="event.stopPropagation(); deleteWeeklyTopic(${idx})">Delete</button>` : ''}
+                    </div>
+                    <div class="details">
+                        ${editMode ? `
+                            <div class="form-group" onclick="event.stopPropagation()">
+                                <label>Title:</label>
+                                <input type="text" value="${topic.title}" onchange="updateWeeklyTopic(${idx}, 'title', this.value)" onclick="event.stopPropagation()">
+                            </div>
+                            <div class="form-group" onclick="event.stopPropagation()">
+                                <label>Content:</label>
+                                <textarea onchange="updateWeeklyTopic(${idx}, 'content', this.value)" onclick="event.stopPropagation()">${topic.content}</textarea>
+                            </div>
+                        ` : ''}
+                        <div style="margin-top: 10px;">
+                            <strong style="color: #dbeafe;">Key Points:</strong>
+                            <ul style="margin-left: 20px; margin-top: 10px;">
+                                ${topic.keyPoints.map((point, pidx) => `<li>${point}${editMode ? `<button class="edit-button delete" style="margin-left: 10px; padding: 4px 8px;" onclick="event.stopPropagation(); deleteKeyPoint(${idx}, ${pidx})">Remove</button>` : ''}</li>`).join('')}
+                            </ul>
+                        </div>
+                        ${editMode ? `<button class="edit-button add" style="margin-top: 10px;" onclick="event.stopPropagation(); addKeyPoint(${idx})">+ Add Key Point</button>` : ''}
+                        <div style="margin-top: 10px;">
+                            <span class="status-badge ${topic.status === 'Completed' ? 'status-active' : 'status-warning'}">${topic.status}</span>
+                            ${editMode ? `
+                                <select onchange="updateWeeklyTopic(${idx}, 'status', this.value)" onclick="event.stopPropagation()" style="margin-left: 10px; padding: 4px 8px; background: #0f172a; color: #e2e8f0; border: 1px solid #334155; border-radius: 4px;">
+                                    <option value="Completed" ${topic.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                                    <option value="In Progress" ${topic.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                                </select>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderShoutouts() {
+            const container = document.getElementById('shoutoutContainer');
+            container.innerHTML = defaultData.shoutouts.map((shoutout, idx) => `
+                <div class="shoutout-item">
+                    <div class="shoutout-content">
+                        <div class="shoutout-title">⭐ ${shoutout.name} - ${shoutout.title}</div>
+                        <div class="shoutout-description">${shoutout.description}</div>
+                        ${editMode ? `
+                            <div style="margin-top: 10px;">
+                                <input type="text" placeholder="Name" value="${shoutout.name}" onchange="updateShoutout(${idx}, 'name', this.value)" style="width: 100%; padding: 5px; margin-bottom: 5px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 4px;">
+                                <input type="text" placeholder="Title" value="${shoutout.title}" onchange="updateShoutout(${idx}, 'title', this.value)" style="width: 100%; padding: 5px; margin-bottom: 5px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 4px;">
+                                <textarea placeholder="Description" onchange="updateShoutout(${idx}, 'description', this.value)" style="width: 100%; padding: 5px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 4px; resize: vertical; min-height: 60px;">${shoutout.description}</textarea>
+                            </div>
+                        ` : ''}
+                    </div>
+                    ${editMode ? `<button class="edit-button delete" onclick="deleteShoutout(${idx})" style="align-self: flex-start;">Delete</button>` : ''}
+                </div>
+            `).join('');
+        }
+
+        // ===== EDIT MODE =====
+        function toggleEditMode() {
+            editMode = !editMode;
+            const indicator = document.getElementById('modeIndicator');
+            const addWeeklyBtn = document.getElementById('addWeeklyBtn');
+            const addShoutoutBtn = document.getElementById('addShoutoutBtn');
+            const addKPIBtn = document.getElementById('addKPIBtn');
+
+            if (editMode) {
+                indicator.textContent = 'EDIT MODE';
+                indicator.classList.remove('view');
+                indicator.classList.add('edit');
+                addWeeklyBtn.style.display = 'inline-block';
+                addShoutoutBtn.style.display = 'inline-block';
+                addKPIBtn.style.display = 'inline-block';
+            } else {
+                indicator.textContent = 'VIEW MODE';
+                indicator.classList.remove('edit');
+                indicator.classList.add('view');
+                addWeeklyBtn.style.display = 'none';
+                addShoutoutBtn.style.display = 'none';
+                addKPIBtn.style.display = 'none';
+            }
+
+            renderWeeklyTopics();
+            renderShoutouts();
+            renderKPIs();
+            renderSafetyMetrics();
+            renderPriorityActions();
+        }
+
+        function editField(event) {
+            if (!editMode) return;
+            
+            const element = event.target;
+            const currentValue = element.innerHTML;
+            const fieldName = element.id;
+            
+            const input = document.createElement('textarea');
+            input.className = 'editable-input';
+            input.value = currentValue.replace(/<[^>]*>/g, ''); // Remove HTML tags for editing
+            input.style.minHeight = '60px';
+            
+            element.replaceWith(input);
+            input.focus();
+            
+            function save() {
+                const newValue = input.value;
+                element.innerHTML = newValue; // Keep as text, user can add HTML if needed
+                defaultData[fieldName] = newValue;
+                input.replaceWith(element);
+            }
+            
+            input.addEventListener('blur', save);
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && e.ctrlKey) save();
+            });
+        }
+
+        function editMetric(event) {
+            if (!editMode) return;
+            
+            event.stopPropagation();
+            const element = event.target;
+            const fieldName = element.id;
+            const currentValue = element.textContent;
+            
+            const input = document.createElement('input');
+            input.className = 'editable-input';
+            input.type = 'number';
+            input.value = currentValue;
+            input.style.width = 'auto';
+            input.style.minWidth = '60px';
+            
+            element.replaceWith(input);
+            input.focus();
+            input.select();
+            
+            function save() {
+                const newValue = input.value;
+                element.textContent = newValue;
+                defaultData.metrics[fieldName] = newValue;
+                input.replaceWith(element);
+                updateDashboard();
+            }
+            
+            input.addEventListener('blur', save);
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') save();
+            });
+        }
+
+        // ===== WEEKLY TOPICS MANAGEMENT =====
+        function addWeeklyTopic() {
+            const newTopic = {
+                week: `Week ${defaultData.weeklyTopics.length + 1}`,
+                title: 'New Topic',
+                content: 'Topic description',
+                keyPoints: ['Point 1', 'Point 2'],
+                status: 'In Progress'
+            };
+            defaultData.weeklyTopics.push(newTopic);
+            renderWeeklyTopics();
+        }
+
+        function deleteWeeklyTopic(idx) {
+            if (confirm('Delete this topic?')) {
+                defaultData.weeklyTopics.splice(idx, 1);
+                renderWeeklyTopics();
+            }
+        }
+
+        function updateWeeklyTopic(idx, field, value) {
+            defaultData.weeklyTopics[idx][field] = value;
+            renderWeeklyTopics();
+        }
+
+        function deleteKeyPoint(topicIdx, pointIdx) {
+            defaultData.weeklyTopics[topicIdx].keyPoints.splice(pointIdx, 1);
+            renderWeeklyTopics();
+        }
+
+        function addKeyPoint(topicIdx) {
+            const point = prompt('Enter new key point:');
+            if (point) {
+                defaultData.weeklyTopics[topicIdx].keyPoints.push(point);
+                renderWeeklyTopics();
+            }
+        }
+
+        // ===== SHOUTOUT MANAGEMENT =====
+        function addShoutout() {
+            const newShoutout = {
+                name: 'New Person',
+                title: 'Achievement',
+                description: 'Description of their achievement'
+            };
+            defaultData.shoutouts.push(newShoutout);
+            renderShoutouts();
+        }
+
+        function deleteShoutout(idx) {
+            if (confirm('Delete this shoutout?')) {
+                defaultData.shoutouts.splice(idx, 1);
+                renderShoutouts();
+            }
+        }
+
+        function updateShoutout(idx, field, value) {
+            defaultData.shoutouts[idx][field] = value;
+            renderShoutouts();
+        }
+
+        // ===== UTILITY FUNCTIONS =====
+        function updateTimestamp() {
+            const now = new Date();
+            const formatted = now.toLocaleString('en-US', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+            document.getElementById('lastUpdate').textContent = formatted;
+            document.getElementById('footerUpdate').textContent = formatted;
+        }
+
+        function filterView(viewName) {
+            document.querySelectorAll('.view-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            document.getElementById(viewName + '-section').style.display = 'block';
+            document.querySelectorAll('.controls button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function toggleExpand(element) {
+            element.classList.toggle('collapsed');
+        }
+
+        // ===== KPI MANAGEMENT =====
+        function renderKPIs() {
+            const container = document.getElementById('kpiContainer');
+            container.innerHTML = defaultData.kpis.map((kpi, kpiIdx) => {
+                const maxValue = Math.max(...kpi.bars.map(b => b.value));
+                return `
+                    <div class="card" ${editMode ? 'style="border-color: #3b82f6;"' : ''}>
+                        <div class="card-header">
+                            <div class="card-title" style="margin: 0; flex: 1;">
+                                ${editMode ? `
+                                    <input type="text" value="${kpi.title}" onchange="updateKPITitle(${kpiIdx}, this.value)" style="background: #0f172a; border: 1px solid #3b82f6; color: #e2e8f0; padding: 5px 8px; border-radius: 4px; font-weight: 700; text-transform: uppercase; font-size: 0.95rem;">
+                                ` : kpi.title}
+                            </div>
+                            ${editMode ? `<button class="edit-button delete" onclick="deleteKPI(${kpiIdx})">Delete</button>` : ''}
+                        </div>
+                        
+                        <div class="bar-chart" style="margin-top: 20px;">
+                            ${kpi.bars.map((bar, barIdx) => `
+                                <div class="bar" style="height: ${(bar.value / maxValue) * 100}%;" title="${bar.label}: ${bar.value}">
+                                    <div class="bar-value" ${editMode ? `onclick="editBarValue(${kpiIdx}, ${barIdx})" style="cursor: pointer;"` : ''}>${bar.value}</div>
+                                    <div class="bar-label" ${editMode ? `onclick="editBarLabel(${kpiIdx}, ${barIdx})" style="cursor: pointer;"` : ''}>${bar.label}</div>
+                                    ${editMode ? `<button class="edit-button delete" onclick="deleteBar(${kpiIdx}, ${barIdx})" style="position: absolute; top: 5px; right: -35px; padding: 4px 8px; font-size: 0.75rem;">✕</button>` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        ${editMode ? `
+                            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #334155;">
+                                <button class="edit-button add" onclick="addBar(${kpiIdx})">+ Add Bar</button>
+                                <div style="margin-top: 15px;">
+                                    <label style="display: block; color: #94a3b8; font-size: 0.8rem; margin-bottom: 5px;">Edit Bars:</label>
+                                    ${kpi.bars.map((bar, barIdx) => `
+                                        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                                            <input type="text" placeholder="Label" value="${bar.label}" onchange="updateBarLabel(${kpiIdx}, ${barIdx}, this.value)" style="flex: 1; background: #0f172a; border: 1px solid #334155; color: #e2e8f0; padding: 5px; border-radius: 4px;">
+                                            <input type="number" placeholder="Value" value="${bar.value}" onchange="updateBarValue(${kpiIdx}, ${barIdx}, parseInt(this.value))" style="width: 80px; background: #0f172a; border: 1px solid #334155; color: #e2e8f0; padding: 5px; border-radius: 4px;">
+                                            <button class="edit-button delete" onclick="deleteBar(${kpiIdx}, ${barIdx})" style="padding: 5px 10px;">Remove</button>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function addKPI() {
+            const newKPI = {
+                title: 'New KPI Chart',
+                bars: [
+                    { label: 'Category 1', value: 5 },
+                    { label: 'Category 2', value: 8 },
+                    { label: 'Category 3', value: 6 }
+                ]
+            };
+            defaultData.kpis.push(newKPI);
+            renderKPIs();
+        }
+
+        function deleteKPI(kpiIdx) {
+            if (confirm('Delete this KPI chart?')) {
+                defaultData.kpis.splice(kpiIdx, 1);
+                renderKPIs();
+            }
+        }
+
+        function updateKPITitle(kpiIdx, newTitle) {
+            defaultData.kpis[kpiIdx].title = newTitle;
+            renderKPIs();
+        }
+
+        function addBar(kpiIdx) {
+            const newBar = {
+                label: 'New Category',
+                value: 5
+            };
+            defaultData.kpis[kpiIdx].bars.push(newBar);
+            renderKPIs();
+        }
+
+        function deleteBar(kpiIdx, barIdx) {
+            if (confirm('Delete this bar?')) {
+                defaultData.kpis[kpiIdx].bars.splice(barIdx, 1);
+                renderKPIs();
+            }
+        }
+
+        function updateBarLabel(kpiIdx, barIdx, newLabel) {
+            defaultData.kpis[kpiIdx].bars[barIdx].label = newLabel;
+            renderKPIs();
+        }
+
+        function updateBarValue(kpiIdx, barIdx, newValue) {
+            defaultData.kpis[kpiIdx].bars[barIdx].value = newValue;
+            renderKPIs();
+        }
+
+        function editBarValue(kpiIdx, barIdx) {
+            if (!editMode) return;
+            const currentValue = defaultData.kpis[kpiIdx].bars[barIdx].value;
+            const newValue = prompt('Enter new value:', currentValue);
+            if (newValue !== null && !isNaN(newValue)) {
+                updateBarValue(kpiIdx, barIdx, parseInt(newValue));
+            }
+        }
+
+        function editBarLabel(kpiIdx, barIdx) {
+            if (!editMode) return;
+            const currentLabel = defaultData.kpis[kpiIdx].bars[barIdx].label;
+            const newLabel = prompt('Enter new label:', currentLabel);
+            if (newLabel !== null) {
+                updateBarLabel(kpiIdx, barIdx, newLabel);
+            }
+        }
+
+        // ===== SAFETY METRICS RENDERING =====
+        function renderSafetyMetrics() {
+            const container = document.getElementById('safetyMetricsContainer');
+            if (!container) return;
+            
+            container.innerHTML = defaultData.safetyMetrics.map((metric, idx) => {
+                const percentage = Math.min(100, (metric.value / metric.target) * 100);
+                const gaugeClass = metric.status;
+                
+                return `
+                    <div class="safety-metric-card ${gaugeClass}">
+                        <div class="metric-header">
+                            <div style="flex: 1;">
+                                <div class="metric-title">${editMode ? `<input type="text" value="${metric.title}" onchange="updateSafetyMetric(${idx}, 'title', this.value)" style="background: #0f172a; border: 1px solid #3b82f6; color: #e2e8f0; padding: 5px 8px; border-radius: 4px; width: 100%; font-weight: 700; text-transform: uppercase; font-size: 0.95rem;">` : metric.title}</div>
+                                <div class="metric-status-badge ${gaugeClass}">${editMode ? `<select onchange="updateSafetyMetric(${idx}, 'status', this.value)" style="padding: 4px 8px; background: #0f172a; border: 1px solid #3b82f6; color: #e2e8f0; border-radius: 4px; margin-top: 5px; font-weight: 700;"><option value="critical" ${metric.status === 'critical' ? 'selected' : ''}>CRITICAL</option><option value="warning" ${metric.status === 'warning' ? 'selected' : ''}>WARNING</option><option value="good" ${metric.status === 'good' ? 'selected' : ''}>GOOD</option></select>` : metric.status}</div>
+                            </div>
+                            ${editMode ? `<button class="edit-button delete" onclick="deleteSafetyMetric(${idx})" style="align-self: flex-start;">Delete</button>` : ''}
+                        </div>
+                        
+                        <div class="metric-value-display">
+                            <span class="metric-large-value">${editMode ? `<input type="number" value="${metric.value}" onchange="updateSafetyMetric(${idx}, 'value', parseFloat(this.value))" style="background: #0f172a; border: 1px solid #3b82f6; color: #e2e8f0; padding: 5px 8px; border-radius: 4px; width: 80px; font-size: 1.5rem; font-weight: 800;">` : metric.value}</span>
+                            <span class="metric-unit">${editMode ? `<input type="text" value="${metric.unit}" onchange="updateSafetyMetric(${idx}, 'unit', this.value)" style="background: #0f172a; border: 1px solid #3b82f6; color: #e2e8f0; padding: 5px 8px; border-radius: 4px; width: 50px; font-weight: 600;">` : metric.unit}</span>
+                        </div>
+                        
+                        <div class="metric-target">
+                            ${editMode ? `Target: <input type="number" value="${metric.target}" onchange="updateSafetyMetric(${idx}, 'target', parseFloat(this.value))" style="background: #0f172a; border: 1px solid #3b82f6; color: #e2e8f0; padding: 3px 6px; border-radius: 4px; width: 60px;"><span style="color: #94a3b8;">${metric.unit}</span> | Current: ${metric.value}<span style="color: #94a3b8;">${metric.unit}</span>` : `Target: ${metric.target}${metric.unit} | Current: ${metric.value}${metric.unit}`}
+                        </div>
+                        
+                        <div class="metric-gauge">
+                            <div class="metric-gauge-fill ${gaugeClass}" style="width: ${Math.min(100, percentage)}%"></div>
+                        </div>
+                        
+                        <div class="metric-description">${editMode ? `<textarea onchange="updateSafetyMetric(${idx}, 'description', this.value)" style="background: #0f172a; border: 1px solid #3b82f6; color: #e2e8f0; padding: 5px 8px; border-radius: 4px; width: 100%; min-height: 50px; font-size: 0.85rem;">${metric.description}</textarea>` : metric.description}</div>
+                        
+                        <div class="metric-recommendation">📋 ${editMode ? `<textarea onchange="updateSafetyMetric(${idx}, 'recommendation', this.value)" style="background: #0f172a; border: 1px solid #3b82f6; color: #e2e8f0; padding: 5px 8px; border-radius: 4px; width: 100%; min-height: 50px; font-size: 0.85rem;">${metric.recommendation}</textarea>` : metric.recommendation}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Add button for new metric
+            if (editMode && container && container.parentNode) {
+                // Remove any existing add button first
+                const existingBtn = container.parentNode.querySelector('[onclick="addSafetyMetric()"]');
+                if (existingBtn && existingBtn.parentNode) {
+                    existingBtn.parentNode.remove();
+                }
+                
+                // Add new button
+                const addBtn = document.createElement('div');
+                addBtn.style.gridColumn = '1 / -1';
+                addBtn.style.textAlign = 'center';
+                addBtn.style.marginTop = '20px';
+                addBtn.innerHTML = `<button class="edit-button add" onclick="addSafetyMetric()">+ Add New Safety Metric</button>`;
+                container.parentNode.insertBefore(addBtn, container.nextSibling);
+            }
+        }
+        
+        function updateSafetyMetric(idx, field, value) {
+            defaultData.safetyMetrics[idx][field] = value;
+            renderSafetyMetrics();
+        }
+        
+        function deleteSafetyMetric(idx) {
+            if (confirm('Delete this safety metric?')) {
+                defaultData.safetyMetrics.splice(idx, 1);
+                renderSafetyMetrics();
+            }
+        }
+        
+        function addSafetyMetric() {
+            const newMetric = {
+                title: 'New Safety Metric',
+                value: 0,
+                target: 10,
+                unit: '%',
+                status: 'warning',
+                description: 'Description of what this metric measures',
+                recommendation: 'Recommended action to improve this metric'
+            };
+            defaultData.safetyMetrics.push(newMetric);
+            renderSafetyMetrics();
+        }
+
+        function renderPriorityActions() {
+            const container = document.getElementById('priorityActionsContainer');
+            if (!container) return;
+            
+            container.innerHTML = defaultData.priorityActions.map((action, idx) => `
+                <div class="priority-action-card level${action.level}">
+                    <div class="priority-header">
+                        <span class="priority-badge ${action.priority.toLowerCase()}">${editMode ? `<select onchange="updatePriorityAction(${idx}, 'priority', this.value)" style="padding: 4px 8px; background: #0f172a; border: 1px solid #3b82f6; color: #e2e8f0; border-radius: 4px; font-weight: 700; text-transform: uppercase;"><option value="CRITICAL" ${action.priority === 'CRITICAL' ? 'selected' : ''}>CRITICAL</option><option value="HIGH" ${action.priority === 'HIGH' ? 'selected' : ''}>HIGH</option><option value="MEDIUM" ${action.priority === 'MEDIUM' ? 'selected' : ''}>MEDIUM</option></select>` : action.priority}</span>
+                        <div class="priority-title">${editMode ? `<input type="text" value="${action.title}" onchange="updatePriorityAction(${idx}, 'title', this.value)" style="background: #0f172a; border: 1px solid #3b82f6; color: #e2e8f0; padding: 5px 8px; border-radius: 4px; flex: 1; margin-left: 10px; font-weight: 700; font-size: 1.1rem;">` : action.title}</div>
+                        ${editMode ? `<button class="edit-button delete" onclick="deletePriorityAction(${idx})" style="margin-left: 10px;">Delete</button>` : ''}
+                    </div>
+                    
+                    <div class="priority-description">${editMode ? `<textarea onchange="updatePriorityAction(${idx}, 'description', this.value)" style="background: #0f172a; border: 1px solid #3b82f6; color: #e2e8f0; padding: 5px 8px; border-radius: 4px; width: 100%; min-height: 60px; font-size: 0.95rem; margin-top: 10px;">${action.description}</textarea>` : action.description}</div>
+                    
+                    <div class="priority-details">
+                        <div class="priority-detail">
+                            <div class="priority-detail-label">Owner</div>
+                            <div class="priority-detail-value">${editMode ? `<input type="text" value="${action.owner}" onchange="updatePriorityAction(${idx}, 'owner', this.value)" style="background: #0f172a; border: 1px solid #3b82f6; color: #e2e8f0; padding: 5px 8px; border-radius: 4px; width: 100%;">` : action.owner}</div>
+                        </div>
+                        <div class="priority-detail">
+                            <div class="priority-detail-label">Timeline</div>
+                            <div class="priority-detail-value">${editMode ? `<input type="text" value="${action.timeline}" onchange="updatePriorityAction(${idx}, 'timeline', this.value)" style="background: #0f172a; border: 1px solid #3b82f6; color: #e2e8f0; padding: 5px 8px; border-radius: 4px; width: 100%;">` : action.timeline}</div>
+                        </div>
+                        <div class="priority-detail">
+                            <div class="priority-detail-label">Impact</div>
+                            <div class="priority-detail-value">${editMode ? `<select onchange="updatePriorityAction(${idx}, 'impact', this.value)" style="padding: 5px 8px; background: #0f172a; border: 1px solid #3b82f6; color: #e2e8f0; border-radius: 4px; width: 100%;"><option value="Low" ${action.impact === 'Low' ? 'selected' : ''}>Low</option><option value="Medium" ${action.impact === 'Medium' ? 'selected' : ''}>Medium</option><option value="High" ${action.impact === 'High' ? 'selected' : ''}>High</option></select>` : action.impact}</div>
+                        </div>
+                        <div class="priority-detail">
+                            <div class="priority-detail-label">Success Metrics</div>
+                            <div class="priority-detail-value">${editMode ? `<input type="text" value="${action.metrics}" onchange="updatePriorityAction(${idx}, 'metrics', this.value)" style="background: #0f172a; border: 1px solid #3b82f6; color: #e2e8f0; padding: 5px 8px; border-radius: 4px; width: 100%;">` : action.metrics}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Add button for new action
+            if (editMode && container && container.parentNode) {
+                // Remove any existing add button first
+                const existingBtn = container.parentNode.querySelector('[onclick="addPriorityAction()"]');
+                if (existingBtn && existingBtn.parentNode) {
+                    existingBtn.parentNode.remove();
+                }
+                
+                // Add new button
+                const addBtn = document.createElement('div');
+                addBtn.style.textAlign = 'center';
+                addBtn.style.marginTop = '20px';
+                addBtn.innerHTML = `<button class="edit-button add" onclick="addPriorityAction()">+ Add New Priority Action</button>`;
+                container.parentNode.insertBefore(addBtn, container.nextSibling);
+            }
+        }
+        
+        function updatePriorityAction(idx, field, value) {
+            defaultData.priorityActions[idx][field] = value;
+            // Update level based on priority
+            if (field === 'priority') {
+                defaultData.priorityActions[idx].level = value === 'CRITICAL' ? 1 : value === 'HIGH' ? 2 : 3;
+            }
+            renderPriorityActions();
+        }
+        
+        function deletePriorityAction(idx) {
+            if (confirm('Delete this priority action?')) {
+                defaultData.priorityActions.splice(idx, 1);
+                renderPriorityActions();
+            }
+        }
+        
+        function addPriorityAction() {
+            const newAction = {
+                priority: 'MEDIUM',
+                level: 3,
+                title: 'New Priority Action',
+                description: 'Description of this priority action',
+                impact: 'Medium',
+                timeline: 'TBD',
+                owner: 'TBD',
+                metrics: 'Define success metrics'
+            };
+            defaultData.priorityActions.push(newAction);
+            renderPriorityActions();
+        }
+
+        // Initialize
+        window.addEventListener('load', initDashboard);
+    </script>
+</body>
+</html>

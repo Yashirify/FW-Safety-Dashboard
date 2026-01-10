@@ -1,0 +1,149 @@
+{
+  "lastUpdated": "2026-01-04T14:38:50.815220",
+  "updatedBy": "System - Initial Setup",
+  "kpis": [
+    {
+      "title": "Total Incidents Analyzed",
+      "bars": [
+        {"label": "OSHA Recordable", "value": 6, "description": "46.15% - Reportable to OSHA"},
+        {"label": "Non-Medical", "value": 7, "description": "53.85% - Lesser severity"}
+      ]
+    },
+    {
+      "title": "Incidents by Workstream (Book4 Data)",
+      "bars": [
+        {"label": "Manual Material Handling", "value": 10, "description": "76.92% - CRITICAL"},
+        {"label": "Falling Object", "value": 1, "description": "7.69%"},
+        {"label": "Hand Tools/Equipment", "value": 1, "description": "7.69%"},
+        {"label": "Other", "value": 1, "description": "7.69%"}
+      ]
+    },
+    {
+      "title": "Incidents by Body Part Affected (Book4 Data)",
+      "bars": [
+        {"label": "Shoulder", "value": 4, "description": "30.77% - Most Frequent"},
+        {"label": "Wrist", "value": 2, "description": "15.38% - Highest Severity"},
+        {"label": "Face - Eyes", "value": 2, "description": "15.38% - 50% OSHA Rate"},
+        {"label": "Other", "value": 5, "description": "38.46%"}
+      ]
+    }
+  ],
+  "safetyMetrics": [
+    {
+      "title": "OSHA Recordable Rate",
+      "value": 46.15,
+      "target": 5,
+      "unit": "%",
+      "status": "critical",
+      "description": "CRITICAL: 46.15% of all incidents (6 of 13) are OSHA Recordable. This is 9x ABOVE industry standard. Indicates serious workplace injuries that must be reported to OSHA.",
+      "recommendation": "URGENT ACTION REQUIRED: Implement comprehensive safety improvements across all workstreams, with particular focus on Manual Material Handling where 50% of incidents are OSHA Recordable."
+    },
+    {
+      "title": "Manual Material Handling Dominance",
+      "value": 76.92,
+      "target": 30,
+      "unit": "%",
+      "status": "critical",
+      "description": "Manual Material Handling accounts for 10 of 13 incidents (76.92%). This single workstream represents nearly 4x the safe industry threshold. Risk Score: 500 (CRITICAL). OSHA Rate in this workstream: 50%.",
+      "recommendation": "CRITICAL PRIORITY: Ergonomic assessment of all material handling tasks. Implement lifting aids, proper technique training, workstation redesign, and job rotation. This is the #1 root cause of injuries."
+    },
+    {
+      "title": "Wrist Injury Risk - HIGHEST SEVERITY",
+      "value": 100,
+      "target": 50,
+      "unit": "%",
+      "status": "critical",
+      "description": "All wrist injuries (2 incidents) are OSHA Recordable (100% severity). Risk Score: 200 (CRITICAL). While only 15% of total incidents, the severity of wrist injuries is extreme. Both are related to Manual Material Handling.",
+      "recommendation": "HIGH PRIORITY: Immediate review of manual handling techniques and tools. Provide wrist supports, consider task redesign, implement anti-fatigue protocols, and mandatory wrist protection when handling."
+    },
+    {
+      "title": "Shoulder Injury Rate - Most Frequent",
+      "value": 30.77,
+      "target": 10,
+      "unit": "%",
+      "status": "warning",
+      "description": "Shoulder is the most frequently injured body part (4 incidents, 30.77%). Risk Score: 100 (HIGH). Pattern suggests cumulative/repetitive strain from lifting and carrying. 3 are non-medical, 1 is OSHA Recordable (25% severity rate for shoulders).",
+      "recommendation": "PRIORITY 2: Implement shoulder-focused ergonomics program. Introduce mechanical lifting aids, rotate workers to reduce repetitive strain, add stretching/strengthening exercises to wellness programs, and modify work surfaces to minimize overhead reaching."
+    },
+    {
+      "title": "Hand Tools/Equipment Risk - MAXIMUM SEVERITY",
+      "value": 100,
+      "target": 50,
+      "unit": "%",
+      "status": "critical",
+      "description": "The single Hand Tools/Equipment incident (1 incident) is 100% OSHA Recordable. While small sample size, the severity rate is maximum. This suggests tool-related hazards are inherently dangerous when they occur.",
+      "recommendation": "URGENT: Comprehensive tool safety audit. Evaluate all hand tools for ergonomic design, consider tool guards/protective equipment, implement mandatory tool inspection protocols, and provide specialized hand tool training."
+    },
+    {
+      "title": "Facial Injury Risk - Moderate Concern",
+      "value": 50,
+      "target": 10,
+      "unit": "%",
+      "status": "warning",
+      "description": "Face injuries (Eyes + Nose = 3 incidents, 23.07% of total). Eyes: 50% OSHA rate (1 of 2), Nose: 0% OSHA rate. Risk Score: 100 (HIGH). All facial injuries occur in Manual Material Handling workstream. Pattern suggests flying debris or impact hazards.",
+      "recommendation": "PRIORITY 3: Implement mandatory facial PPE in Manual Material Handling areas. Regular PPE compliance audits, eye protection fit-testing, and assessment of material movement to prevent flying hazards. Emphasize why eye protection saves vision."
+    }
+  ],
+  "priorityActions": [
+    {
+      "priority": "CRITICAL",
+      "level": 1,
+      "title": "PHASE 1: Comprehensive Manual Material Handling Audit & Redesign",
+      "description": "10 incidents (76.92%) in this category with 50% OSHA Recordable rate represents unacceptable risk level. Required Actions: (1) Immediate ergonomic assessment of all packing lane stations (129, 76) and decasing stations using professional ergonomist; (2) Assess each task for load weight, distance, frequency, awkward postures; (3) Evaluate current lifting aids and equipment effectiveness; (4) Design engineering controls (mechanical assists, conveyor modifications, workstation height adjustments); (5) Implement best practices from industry standards.",
+      "impact": "CRITICAL",
+      "timeline": "Week 1-2: Audit | Week 3-6: Design & Implementation",
+      "owner": "Safety Director + Operations Manager + Occupational Health Specialist",
+      "metrics": "Week 1: Audit complete. Week 4: First interventions deployed. Target: Reduce to 5 incidents, decrease OSHA rate to 20%"
+    },
+    {
+      "priority": "CRITICAL",
+      "level": 1,
+      "title": "PHASE 2: Mandatory Safety Training - Material Handling & Ergonomics",
+      "description": "All associates in Footwear department must complete comprehensive training: (1) Proper lifting technique (bend knees, keep load close, test weight first); (2) Use of mechanical lifting aids; (3) Task analysis and load assessment; (4) Reporting unsafe conditions; (5) Stretching and body mechanics for injury prevention. Training must be hands-on, in-station, with supervisor competency checks. Include data from this incident analysis to show real consequences.",
+      "impact": "CRITICAL",
+      "timeline": "Complete by end of Week 2 (all shifts)",
+      "owner": "Safety Team (Lead Trainer) + Department Supervisors",
+      "metrics": "100% attendance + competency certification. Pre/post assessment scores >85%. Monthly refreshers."
+    },
+    {
+      "priority": "CRITICAL",
+      "level": 1,
+      "title": "PHASE 3: Wrist Safety - Tool Review & Hand Protection Program",
+      "description": "Wrist injuries show 100% OSHA Recordable severity (2 incidents). This indicates tool hazards are extremely serious when they occur. Required: (1) Audit all hand tools used in Manual Material Handling; (2) Evaluate for ergonomic design, vibration, repetitive stress hazards; (3) Implement mandatory wrist supports/braces for high-risk tasks; (4) Provide anti-vibration gloves for power tools; (5) Limit repetitive wrist motions via job rotation; (6) Education on early signs of carpal tunnel and RSI.",
+      "impact": "CRITICAL",
+      "timeline": "Week 1: Tool audit | Week 2: PPE procurement | Week 3: Implementation",
+      "owner": "Safety Team + Procurement + Department Supervisors",
+      "metrics": "Zero wrist injuries going forward. 100% PPE compliance. Monthly ergonomic assessments."
+    },
+    {
+      "priority": "CRITICAL",
+      "level": 1,
+      "title": "PHASE 4: Shoulder Injury Prevention - Multi-Modal Approach",
+      "description": "Shoulder injuries are the #1 location (30.77%, 4 incidents). Pattern indicates repetitive/cumulative strain from lifting/carrying in material handling. Strategy: (1) Implement 20-minute stretching/movement breaks every 2 hours; (2) Provide shoulder-focused ergonomic equipment (load carriers, mechanical assists); (3) Job rotation to vary shoulder-loading tasks; (4) Strength/stability training in wellness program; (5) Monitor associates with prior shoulder issues; (6) Modify workstations to reduce reaching distance.",
+      "impact": "CRITICAL",
+      "timeline": "Stretching program: Start immediately | Equipment: Weeks 2-3 | Wellness integration: Week 4",
+      "owner": "Occupational Health + Wellness Coordinator + Operations",
+      "metrics": "4 incidents → <1 per month. Shoulder pain reports decrease by 50%. 90% participation in stretching program."
+    },
+    {
+      "priority": "HIGH",
+      "level": 2,
+      "title": "PHASE 5: Eye & Face Protection Mandate in Material Handling",
+      "description": "Face injuries (3 incidents: 2 eyes, 1 nose) suggest flying debris or impact hazards during material handling. 50% are OSHA Recordable. Required: (1) Mandatory full-face protective equipment for packing and decasing operations; (2) Anti-fog, anti-scratch safety glasses minimum; (3) Face shields for high-hazard stations; (4) Monthly PPE compliance audits; (5) Education on why eye protection is critical.",
+      "impact": "HIGH",
+      "timeline": "Week 1: Implement mandate with training | Ongoing: Monthly audits",
+      "owner": "Safety Team + Department Supervisors",
+      "metrics": "Zero face injuries going forward. 100% PPE compliance on first observation. Maintain monthly."
+    },
+    {
+      "priority": "HIGH",
+      "level": 2,
+      "title": "Establish Incident Monitoring & Trending System",
+      "description": "Current analysis shows 13 incidents over an unspecified period. Must establish: (1) Daily incident tracking with real-time reporting; (2) Weekly safety metrics reviews; (3) Monthly trend analysis; (4) Root cause investigation for all incidents; (5) Corrective action tracking; (6) Associate near-miss reporting culture; (7) Dashboard for leadership visibility. Use this dashboard as the centerpiece for tracking progress.",
+      "impact": "HIGH",
+      "timeline": "System ready by end of Week 1, data entry begins immediately",
+      "owner": "Safety Director + Safety Coordinator",
+      "metrics": "Daily tracking started. Weekly metrics reports. 100% root cause investigations. Corrective actions closed >90%."
+    }
+  ]
+}
